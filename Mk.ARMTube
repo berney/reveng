@@ -1,0 +1,71 @@
+# Project: CRCRevEngA
+
+# Toolflags:
+CCflags = -c -depend !Depend -IC:,@ -DPRESETS -throwback -fafhp -Wa -apcs /nonreent/nofp/nofpr
+Linkflags = -aif -Relocatable -o $@
+
+# Final targets:
+@.reveng: @.o.bmpbit @.o.cli @.o.model @.o.poly @.o.preset @.o.reveng @.o.getopt C:o.ansilib 
+        link $(Linkflags) @.o.bmpbit @.o.cli @.o.model @.o.poly @.o.preset @.o.reveng @.o.getopt C:o.ansilib
+        squeeze -f $@
+
+
+# User-editable dependencies:
+.SUFFIXES: .c .h .o
+
+.c.o:
+        cc $(CCflags) -o $@ c.$*
+
+# Static dependencies:
+
+
+# Dynamic dependencies:
+o.bmpbit:	c.bmpbit
+o.bmpbit:	h.reveng
+o.bmpbit:	h.config
+o.cli:	c.cli
+o.cli:	h.getopt
+o.cli:	h.reveng
+o.cli:	h.config
+o.model:	c.model
+o.model:	h.reveng
+o.model:	h.config
+o.poly:	c.poly
+o.poly:	h.reveng
+o.poly:	h.config
+o.preset:	c.preset
+o.preset:	h.reveng
+o.preset:	h.config
+o.reveng:	c.reveng
+o.reveng:	h.reveng
+o.reveng:	h.config
+o.getopt:	c.getopt
+o.getopt:	h.getopt
+
+
+# Mk/ARMTube
+# Greg Cook, 7/Feb/2017
+
+# CRC RevEng: arbitrary-precision CRC calculator and algorithm finder
+# Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017
+# Gregory Cook
+#
+# This file is part of CRC RevEng.
+#
+# CRC RevEng is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# CRC RevEng is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with CRC RevEng.  If not, see <https://www.gnu.org/licenses/>.
+
+# This is a RISC OS Makefile.
+
+# Set the type of RISCOSify to Obey, and run RISCOSify, before using
+# Mk/RISCOS or MK/ARMTube.

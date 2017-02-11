@@ -1,0 +1,3 @@
+| !!CCRomPtc
+/<Obey$Dir>.CCRomPtc.!Load
+If Boot$OSVersion >= 310 Then RMEnsure SharedCLibrary 5.17 RMLoad System:Modules.CLib

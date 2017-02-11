@@ -1,0 +1,703 @@
+CRC RevEng: arbitrary-precision CRC calculator and algorithm finder
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017
+Gregory Cook
+
+This file is part of CRC RevEng.
+
+CRC RevEng is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CRC RevEng is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with CRC RevEng.  If not, see <https://www.gnu.org/licenses/>.
+
+THIRD-PARTY SOFTWARE
+
+CRC RevEng incorporates source code from ASPEX under the terms of
+version 3 of the GNU General Public License (GPLv3).  ASPEX is:
+
+Copyright (C) 1998, 2003 by David A. Hinds -- All Rights Reserved
+
+Homepage: <http://aspex.sourceforge.net/>
+
+ASPEX is licensed under version 2 and all later versions of the GNU
+General Public License, therefore CRC RevEng remains licensed under
+version 3 and all later versions.
+
+Depending on one's interpretation of the License, the author created a
+modified copy of ASPEX as a whole by extracting files getopt.c and
+getopt.h verbatim on 19 December 2010.  These are found in the contrib/
+directory.  A compatible getopt module is available as standard in many
+environments and will work just as well, but this copy is included for
+those ANSI C environments that lack one.
+
+A copy of the RISC OS Shared C Library (CLib), and a patch to make
+certain versions of RISC OS compatible with this version of CLib, are
+supplied with the RISC OS binary under licence from Castle Technology
+Limited for distribution to end users for the purpose of upgrading, if
+required.  These are found in the bin/riscos/ directory.  The ARM Tube
+OS binary, located in the bin/armtubeos/ directory, is statically linked
+with (that is, it incorporates) the RISC OS Shared C Library.
+CLib qualifies as a "System Library" and GPLv3 permits licensees to
+"combine GPLed software with GPL-incompatible System Libraries, [...]
+and distribute them both together."  See Sections 1, 5 and 6 and A Quick
+Guide to GPLv3, <https://www.gnu.org/licenses/quick-guide-gplv3.html>
+The patch is an independent program and is not bound by GPLv3 by mere
+inclusion.  See Section 5.
+
+CRC REVENG
+
+CRC RevEng is an arbitrary-precision, machine word length-independent,
+byte order-independent CRC calculator and algorithm finder in ANSI C.
+It is a port and expansion of the author's crcbfs.pl script from 2007,
+and runs up to 200 times faster on equivalent problems.  It is also a
+reference implementation of the author's "Catalogue of parametrised CRC
+algorithms", with the 91 currently listed models available as presets.
+
+To the author's knowledge CRC RevEng is the first published compiled
+application to address the general case of CRC algorithm reversal and
+reverse engineering, its predecessor crcbfs.pl being the first published
+application of any type to do so.  Greg Ewing of Canterbury University
+in New Zealand solved a CRC algorithm manually on similar principles in
+2010, but partly by feeding chosen plaintexts into an implementation at
+hand.
+
+CRC RevEng is hosted by SourceForge, from where the latest version can
+be downloaded and documentation browsed:
+
+	<http://reveng.sourceforge.net/>
+
+COMPILING
+
+Compiling CRC RevEng is straightforward: in the i386 GNU/Linux, MinGW
+and Raspbian environments, simply cd to the directory containing the
+source files, and enter
+
+	make
+
+A special makefile can also be used in MinGW to make a Windows
+executable with version information and an icon:
+
+	make -f Mk.Win32
+
+In RISC OS, with the Acorn Desktop Development Environment (DDE)
+installed, click Menu on the file RISCOSify, and set its type to
+Obey.  Double-click Select first on RISCOSify, then on Mk/RISCOS.
+
+In non-ASCII compatible environments, the array aliases[] in file
+preset.c may need to be reordered to suit the local string collation
+order.  The correct order of models[] and aliases[] can be verified at
+compile time by the error-free completion of this command:
+
+	make clean pretst
+
+Otherwise, enter commands similar to the following to compile CRC RevEng
+on any ANSI C compliant compiler:
+
+	gcc -O3 -Wall -ansi -c bmpbit.c cli.c model.c poly.c preset.c \
+		reveng.c
+	cd contrib
+	gcc -O3 -Wall -ansi -c getopt.c
+	cd ..
+	gcc -o reveng bmpbit.o cli.o model.o poly.o preset.o reveng.o \
+		contrib/getopt.o
+
+The platform-independent method does not compile the preset models.  To
+compile them, you will need to edit the configuration options in
+config.h to suit your architecture.  Having done so, define the macro
+PRESETS in config.h and recompile as above.
+
+Some enterprise users may wish to disable the -F switch to minimise CPU
+usage.  To do this, define the macro NOFORCE in config.h or on the
+command line.
+
+SYNOPSIS
+
+Usage:	reveng	-cdDesvhu? [-bBfFGlLMrStVXyz]
+		[-a BITS] [-A OBITS] [-i INIT] [-k KPOLY] [-m MODEL]
+		[-p POLY] [-P RPOLY] [-q QPOLY] [-w WIDTH] [-x XOROUT]
+		[STRING...]
+Options:
+	-a BITS		bits per character (1 to n)
+	-A OBITS	bits per output character (1 to n)
+	-i INIT		initial register value
+	-k KPOLY	generator in Koopman notation (implies WIDTH)
+	-m MODEL	preset CRC algorithm
+	-p POLY		generator or search range start polynomial
+	-P RPOLY	reversed generator polynomial (implies WIDTH)
+	-q QPOLY	search range end polynomial
+	-w WIDTH	register size, in bits
+	-x XOROUT	final register XOR value
+Modifier switches:
+	-b big-endian CRC		-B big-endian CRC output
+	-f read files named in STRINGs	-F skip preset model check pass
+	-G skip brute force search pass	-l little-endian CRC
+	-L little-endian CRC output	-M non-augmenting algorithm
+	-r right-justified output	-S print spaces between characters
+	-t left-justified output	-V reverse algorithm only
+	-X print uppercase hexadecimal	-y low bytes first in files
+	-z raw binary STRINGs
+Mode switches:
+	-c calculate CRCs		-d dump algorithm parameters
+	-D list preset algorithms	-e echo (and reformat) input
+	-s search for algorithm		-v calculate reversed CRCs
+	-h | -u | -? show this help
+
+SPECIFYING A MODEL
+
+You can use one of the preset models or specify your own.
+
+	reveng -m crc-32
+
+selects the CRC-32 algorithm used in PKZIP and elsewhere.  You can dump
+any preset model as a Williams model record using -d:
+
+	reveng -m crc-32 -d
+	width=32  poly=0x04c11db7  init=0xffffffff  refin=true
+	refout=true  xorout=0xffffffff  check=0xcbf43926  name="CRC-32"
+
+You can specify the parameters of the model instead:
+
+	reveng -w 32 -p 04c11db7 -i ffffffff -l -x ffffffff
+
+This is equivalent to
+
+	reveng -m crc-32
+
+except the model will have no name when dumped.  (The -l switch sets
+both RefIn = True and RefOut = True.  To set RefOut separately, use
+switches -L and -B.)
+
+The options and switches for specifying a model are:
+
+	-b
+		Big-endian input and output (RefIn = False, RefOut =
+		False).  Implies -B and -r.  This is the default.
+	-B
+		Big-endian output (RefOut = False).  Implies -r.
+	-i INIT
+		A hexadecimal digit string specifying the initial value
+		to set in the shift register before computing the CRC.
+		The width must be specified with -k, -m, -P or -w
+		before -i.
+	-k KPOLY
+		The generator polynomial (see -p), written in the
+		hexadecimal, reversed-reciprocal notation found in
+		Philip Koopman's papers.  The highest-order term is
+		included and the lowest-order term is omitted, shifting
+		the other terms to the right.  Thus 0x18005 is specified
+		as C002.  This automatically provides the Width value.
+	-l
+		Little-endian input and output (RefIn = True, RefOut =
+		True).  Implies -L and -t.
+	-L
+		Little-endian output (RefOut = True).  Implies -t.
+	-M
+		Specifies that the algorithm does not multiply the
+		message polynomial by x^n before division.  The
+		resulting algorithm does not comply with the Williams
+		model, and cannot be dumped with -d.
+	-m MODEL
+		Set the Width, Poly, Init, RefIn, RefOut and XorOut
+		values to the preset named MODEL.  MODEL is matched
+		case-insensitively with the Name and Alias fields in the
+		author's "Catalogue of parametrised CRC algorithms", as
+		of the date of this release.  The preset models can be
+		listed with -D.
+		-M, -r, -S, -t, -X, -y and -z must not precede -m MODEL.
+	-p POLY
+		The Poly value, that is, the generator polynomial that
+		sets the feedback tap positions of the shift register.
+		POLY is written in the hexadecimal, direct notation
+		found in MSB-first code.  The highest-order term is
+		omitted, thus 0x18005 is specified as 8005.
+		-p also sets the start of the range for polynomial range
+		searching, see -q.
+		The width must be specified with -k, -m, -P or -w
+		before -p.
+	-P RPOLY
+		The generator polynomial (see -p), written in the
+		hexadecimal, reversed notation found in LSB-first code.
+		The highest-order term is omitted before reversal, thus
+		0x18005 is specified as A001.  This automatically
+		provides the Width value.
+	-V
+		Reverse the current model.  If RefOut = True, the Init
+		value is reversed otherwise the XorOut value is
+		reversed.  Then the Init and XorOut values are swapped,
+		the generator polynomial is reciprocated and the RefIn
+		and RefOut values are negated.
+		This switch is distinct from -v, see below.
+	-w WIDTH
+		The width, that is, the number of bits in the shift
+		register.
+	-x XOROUT
+		A hexadecimal digit string specifying the value to be
+		added to the final shift register value before output.
+		The width must be specified with -k, -m, -P or -w
+		before -x.
+
+Other model-related options:
+
+	-d
+		Dump a Williams model record of the specified model on
+		standard output.  Though formatted differently, this
+		single-line record has identical semantics to the
+		multi-line records presented in "A Painless Guide to CRC
+		Error Detection Algorithms".  Disabled for the
+		non-compliant models created by -M.
+	-D
+		Dump Williams model records of all preset models on
+		standard output.
+
+INPUT AND OUTPUT
+
+Messages for CRC RevEng to process can be specified as files, as raw
+binary strings, or as numerical (typically hexadecimal) string arguments
+on the command line.  Output from CRC RevEng is either as Williams model
+records (having their own fixed format) or as numerical string arguments
+printed one per line on standard output.
+
+When passing numerical arguments on the command line, each argument is
+conceptually divided into characters, each character consisting of one
+or more hexadecimal digits.  For each character, enough hex digits to
+specify it are read then a number of bits (specified by the -a option)
+are taken from the least significant end, reversed (if RefIn = True) and
+appended to the binary representation of the argument; any excess bits
+are discarded.  The -a option (q.v.) permits a number of useful
+representations of a given underlying binary sequence.
+
+When passing messages as files or as raw binary strings, the same
+division into characters applies; bytes of the message are read until
+enough bits have been collected, then a specified number of bits are
+taken from the specified least significant end of the collection (see
+-y), reflected (if RefIn = True) and added to the binary representation.
+
+When printing output, the binary representation is again divided into
+characters, each of which is reversed (if RefOut = True) and printed
+with the minimum sufficient number of hex digits.
+
+INPUT/OUTPUT OPTIONS
+
+There are a few more options for controlling the presentation of input
+and output:
+
+	-a BITS
+		Specifies the number of bits per character in input and
+		output.  Implies -A BITS.  Raw input messages are
+		selected by -f or -z, otherwise messages are numerical
+		arguments.  Particular values of BITS cause the input to
+		be interpreted as a sequence of:
+		-a 16	16-bit words, raw or as quartets of hex digits.
+			When RefIn or RefOut are True, this is
+			equivalent to swapping the bytes of each pair
+			before input to an 8-bit calculator.
+		-a  8	8-bit characters, raw or as pairs of hex digits.
+			This is the default.
+		-a  7	7-bit characters, one per 8-bit byte (raw) or as
+			pairs of hex digits.
+		-a  4	Single hex digits (numerical arguments only).
+		-a  3	Single octal digits 0-7.
+		-a  1	Single binary digits 0-1.
+		Note that raw messages (files or arguments) containing
+		digits will only be read as expected if there are no
+		characters except digits (not even a final newline or
+		other whitespace), and if the digits are maskable in the
+		system character encoding, as digits 0-9 are in ASCII,
+		EBCDIC and Unicode.  This is because the lowest bits of
+		each byte are extracted as described above.
+	-A OBITS
+		Specifies the number of bits per character in output.
+	-f
+		Arguments are file names; input binary messages from the
+		file data.
+	-r
+		Right-justified output.  If a binary output message does
+		not consist of a whole number of characters, this switch
+		arranges for padding zeroes to be added to the start of
+		the message.  The padding will appear in the MSB of the
+		first character (RefOut = False) or the LSB of the first
+		character (RefOut = True).  -r is the default when
+		RefOut = False.
+	-S
+		Print spaces between the characters of the output
+		string(s).
+	-t
+		Left-justified output.  If a binary output message does
+		not consist of a whole number of characters, this switch
+		arranges for padding zeroes to be added to the end of
+		the message.  The padding will appear in the LSB of the
+		last character (RefOut = False) or the MSB of the last
+		character (RefOut = True).  -t is the default when
+		RefOut = True.
+	-X
+		Print uppercase hexadecimal characters.
+	-y
+		When reading binary messages from files or arguments,
+		and the -a option is more than 8, this option specifies
+		that the first byte of each character contains the LSB.
+	-z
+		Arguments are raw binary strings; input binary messages
+		from the arguments.
+
+CALCULATING AND REVERSING CRCs
+
+When a model has been specified, use -c or -v to calculate CRCs for
+input messages.
+
+	-c
+		Calculate a CRC for each argument and print it on
+		standard output, one per line.
+	-v
+		Reverse the current model (as for -V) AND the order of
+		characters in each argument, calculate a CRC for each
+		reversed argument, reverse the order of characters in
+		each CRC and print it on standard output, one per line.
+
+If -V and -v are given together, their respective model reversals cancel
+out.  CRC RevEng then calculates an ordinary CRC for each argument,
+processing the characters from right to left and likewise emitting the
+CRC characters in reverse order.
+Correspondingly, to obtain the same effect as -v using a model reversed
+by -V, the user must present the characters of his or her message, and
+process those of the returned CRC, in reverse order.
+
+Take care when the CRC width (-w) is not a multiple of the character
+width (-a).  If the result of a calculation is not what you expect, try
+selecting left-justification (with -t) or right-justification (with -r).
+
+The -c mode is, of course, useful for creating a checksum to append to a
+message so that the combination will pass a particular CRC check.  The
+-v mode, on the other hand, is useful for editing a message so as to
+force its checksum to a desired or at least predetermined value.  In
+order to do this there must be some part of the message's data that can
+be modified freely without observable effect; many network protocols and
+file formats, including executables, images and word processor
+documents, have (or can be altered to have) reserved fields or comment
+sections that cannot be easily viewed, and whose contents are entirely
+ignored.
+
+Among the simplest ways to control a CRC calculation is to find one such
+unused space that is both contiguous and large enough to hold a
+checksum.  For example, suppose we have an existing message with an X.25
+CRC:
+
+  0: 44 6F 67 73 2F 2A 12 34  2A 2F 72 6F 63 6B 4E 47 | Dogs/*.4*/rockNG
+
+Here, 4E 47 is the X.25 checksum, and we wish to alter the message
+without either changing the checksum or failing the CRC.  We notice that
+the 7th and 8th bytes can be replaced at will, and these can contain a
+calculated value to force the CRC.  Firstly we change the text as we
+wish:
+
+  0: 43 61 74 73 2F 2A 12 34  2A 2F 72 75 6C 65 4E 47 | Cats/*.4*/ruleNG
+
+Calculate the CRC of the part on the left of the unused space with
+XorOut = 0:
+
+	reveng -m x-25 -x 0 -c 436174732f2a
+	9dc5
+
+Then reverse-calculate the CRC of the part on the right, including the
+old CRC, with Init = 0:
+
+	reveng -m x-25 -i 0 -v 2a2f72756c654e47
+	1505
+
+Now exclusive-OR the two returned CRCs together, and insert the result
+in the unused space.  CRC RevEng can be used to do the exclusive-OR if a
+hex calculator is not to hand:
+
+	reveng -w 16 -p 0001 -c 9dc51505
+	88c0
+
+Our edited message now looks like this:
+
+  0: 43 61 74 73 2F 2A 88 C0  2A 2F 72 75 6C 65 4E 47 | Cats/*.A*/ruleNG
+
+To confirm that it still passes the X.25 CRC:
+
+	reveng -m x-25 -c 436174732f2a88c02a2f72756c65
+	4e47
+
+For more flexible editing options, see Mark Adler's source file spoof.c
+(2014). "spoof.c takes an abbreviated description of the CRC, the
+exclusive-or of the current CRC of the message and the desired CRC, the
+length of the message, and a list of bit locations in a message, and
+tells you which of those bits should be inverted in the message to get
+the desired CRC. Note that it does not need the message itself, due to
+the linearity property of CRCs."
+
+				* * *
+
+In Stigge et al. (section 4.1) a polynomial q(x) is calculated as the
+multiplicative inverse of x^N such that (x^N) q(x) = 1 (mod pCRC(x)).
+The authors promote the extended Euclidean algorithm as a means of
+calculating q(x), however any CRC calculator can also produce it.  The
+reciprocal of the CRC-32 polynomial is 0xdb710641, as output by:
+
+	reveng -w 32 -p 04c11db7 -V -d
+
+The authors' constant CRCINV, a reflected representation of q(x), is the
+CRC of the reversal of the desired remainder, 0x00000001:
+
+	reveng -w 32 -p db710641 -c 80000000
+	5b358fd3
+
+Equivalently, the -v function returns q(x) in direct order from the
+unreflected parameters:
+
+	reveng -w 32 -p 04c11db7 -v 00000001
+	cbf1acda
+
+SEARCHING FOR CRC MODELS
+
+The most important feature of CRC RevEng is the ability to recover the
+parameters of a CRC algorithm from a handful of codewords created by
+that algorithm.  In general at least four data points are needed, either
+as known parameters or as message-CRC pairs.  Extra data points help to
+eliminate false results and to confirm models that are found.
+
+Known parameters are specified using -w, -p, -i and -x (see SPECIFYING A
+MODEL above).  The width, -w, is a required parameter for all searches
+and counts as one of the data points.  The size of characters (words) in
+the protocol must also be known and set with -a if this is not 8 bits.
+
+The search function is selected with -s, and message-CRC pairs are given
+as arguments, each message and CRC combined into one argument.  There
+must not be any non-participating characters between each message and
+its CRC, or the search will not work.  Typically, end-of-message markers
+do not participate in the CRC.
+
+As non-standard algorithms are comparatively rare, the program first
+tries all the preset models of the given width, reporting and exiting if
+one is found.  Otherwise it commences a full search.  As it proceeds it
+prints a progress message from time to time, allowing the search to
+be restarted from that point:
+
+	reveng: searching: width=32  poly=0x50000001  refin=false
+	refout=false
+
+If -b or -l are specified, CRC RevEng only searches for algorithms with
+that bit ordering.  Otherwise, it tries RefIn = False, RefOut = False
+then RefIn = True, RefOut = True.  Crossed-endian algorithms are also
+uncommon and the program will not search for them.
+
+To find the Poly value when Init is not known, at least two arguments
+must have the same length.
+
+To find both the Init and XorOut values, at least two arguments must
+have different lengths; otherwise there is only enough information to
+determine one value, given the other.  If all arguments have the same
+length then, by default,  CRC RevEng fixes XorOut at zero and calculates
+Init accordingly.  (In hardware it is easier to set a non-zero Init than
+to apply a non-zero XorOut.)  To set XorOut to another value, specify
+-x XOROUT; to fix Init and calculate XorOut instead, use -i INIT.
+
+When bit strings are input with -a 1, there is no information on
+endianness.  In such cases -s returns the big- and little-endian forms
+of each algorithm found.  The Check values of these forms will differ,
+as they are always calculated on the 8-bit UTF-8 string "123456789".
+
+POLYNOMIAL RANGE SEARCHING
+
+To restart a stopped search, or to divide a search between several
+processors, CRC RevEng can be instructed to search within a specified
+range of generator polynomial values.
+
+The full search space comprises all 'odd' polynomials of the specified
+WIDTH, that is, polynomials of the form x^n + ... + 1.  Treating the
+concatenated coefficients as a binary integer, the range can be up to
+(but excluding) a specified polynomial, from a specified polynomial
+upwards, or from one polynomial up to (but excluding) another.
+
+Polynomial range searching is enabled using [-p POLY] -q QPOLY, where
+POLY and QPOLY are hex strings.  -p POLY, if given, must precede
+-q QPOLY.  To start searching at a polynomial, use -p POLY -q 0.  To
+stop searching at a polynomial (exclusive), use -q QPOLY.  To search
+between two polynomial values, use -p POLY -q QPOLY.
+
+Range limiting does not apply to the initial check against the preset
+models, or to Init or XorOut values, which are computed using a fast,
+efficient algorithm.
+
+For example, to split a 32-bit search into four processes:
+
+	reveng -w 32 -q 40000000 -s c98964f6b9 a5fa49f2fd 13370aee7df0
+	reveng -w 32 -p 40000000 -q 80000000 \
+		-s c98964f6b9 a5fa49f2fd 13370aee7df0
+	reveng -w 32 -p 80000000 -q c0000000 \
+		-s c98964f6b9 a5fa49f2fd 13370aee7df0
+	reveng -w 32 -p c0000000 -q 0 \
+		-s c98964f6b9 a5fa49f2fd 13370aee7df0
+
+To continue an interrupted search:
+NB: If an either-endian search is stopped while RefIn/RefOut = False
+then it takes two further command lines to complete the search: one
+big-endian range search, and one little-endian full search.
+
+	reveng -w 32 -p 50000001 -q 0 -b \
+		-s c98964f6b9 a5fa49f2fd 13370aee7df0
+	reveng -w 32 -l -s c98964f6b9 a5fa49f2fd 13370aee7df0
+
+The full list of search options is as follows:
+
+	-F
+		Skip the preset model check pass.  (Not recommended.)
+	-G
+		Skip the brute force search pass.
+	-p POLY
+		When followed by -q QPOLY, sets the start of the range
+		(inclusive) for polynomial range searching.  POLY is
+		written in hexadecimal direct notation.  The LSB is
+		forced to 1 as only 'odd' polynomials, with a +1 term,
+		are tested.
+	-q QPOLY
+		Enables polynomial range searching and sets the end of
+		the range (exclusive).  A previous -p POLY is no longer
+		treated as a known generator polynomial and is taken as
+		the start of the range; if there is no previous -p POLY,
+		the start of the range defaults to the lowest odd
+		polynomial.
+		QPOLY is written in hexadecimal direct notation.  If
+		QPOLY is zero, the range extends up to (and including)
+		the highest odd polynomial.  Unlike -p POLY, the LSB is
+		significant.
+	-s
+		Search for and display Williams model records of CRC
+		models matching the arguments and given parameters.
+
+OTHER FEATURES
+
+CRC RevEng provides a few additional options for convenience:
+
+	-e
+		Echo arguments to standard output.  Useful to check that
+		files are being read correctly and, together with -a,
+		-A, -b, -B, -l, -L, -r, -S, -t, -X and -y, to reformat
+		argument strings.
+		The Init value is exclusive-ORed with the beginning of
+		each argument, so that when the argument is not a whole
+		number of bytes long, an equivalent string can be
+		produced for input to a bytewise calculator (which has
+		Init set to 0).
+	-h
+	-u
+	-?
+		Print a summary of options and switches to standard
+		error, and exit.
+
+SEARCH EXAMPLES
+
+	reveng -w 16 -l -F -s 31816b 32c16a 31326a0a
+	reveng -w 32 -p 04c11db7 -l -s c98964f6b9 a5fa49f2fd 13370aee7df0
+	reveng -w 32 -l -s c98964f6b9 a5fa49f2fd 13370aee7df0
+
+A comprehensive list is being compiled.
+
+CAVEATS
+
+In addition to the disclaimers listed at the top of this file and in the
+GNU General Public License (see file COPYING), remember that CRC RevEng
+is merely a search tool, and not authoritative.  Searching is only
+statistical and any particular result may be a fluke, especially from
+a small number of samples.  Also any output is only as accurate as the
+input.
+
+Model reversal (-V, -v) makes little sense on crossed-endian models.
+
+CRC RevEng lacks a facility to generate code to implement specified
+algorithms.  Pycrc by Thomas Pircher (2014) is one suitable code
+generator; Mark Adler's crcany source package (2014) also produces
+source code when compiled and run, and references the author's CRC
+catalogue.
+
+REFERENCES
+
+Adler, Mark (15 January 2017). "zlib Home Site" (section "CRC (Cyclic
+Redundancy Check) Bonus Information").  Contains links to spoof.c.gz and
+crcany.tar.gz.
+  <http://zlib.net/>
+  <https://github.com/madler?tab=repositories>
+
+Bies, Lammert; et al.  "Computer Interfacing Forum" (section "Error
+detection and correction").
+  <https://www.lammertbies.nl/forum/viewforum.php?f=11>
+
+Cook, Greg (6 February 2017).  "Catalogue of parametrised CRC
+algorithms".
+  <http://reveng.sourceforge.net/crc-catalogue/>
+
+Ewing, Gregory C. (March 2010). "Reverse-Engineering a CRC Algorithm".
+Christchurch: University of Canterbury.
+  <https://www.cosc.canterbury.ac.nz/greg.ewing/essays/
+    CRC-Reverse-Engineering.html>
+
+Koopman, Philip (July 2002).  "32-Bit Cyclic Redundancy Codes for
+Internet Applications".  The International Conference on Dependable
+Systems and Networks: 459-468.  doi:10.1109/DSN.2002.1028931.
+  <https://users.ece.cmu.edu/~koopman/networks/dsn02/dsn02_koopman.pdf>
+
+Koopman, Philip (23 January 2017). "Best CRC Polynomials". Pittsburgh:
+Carnegie Mellon University.
+  <https://users.ece.cmu.edu/~koopman/crc/>
+
+Koopman, Philip; Chakravarty, Tridib (June 2004).  "Cyclic Redundancy
+Code (CRC) Polynomial Selection For Embedded Networks".  The
+International Conference on Dependable Systems and Networks: 145-154.
+doi:10.1109/DSN.2004.1311885.
+  <https://users.ece.cmu.edu/~koopman/roses/dsn04/
+    koopman04_crc_poly_embedded.pdf>
+
+Pircher, Thomas (12 December 2016). pycrc. Python based parametrised CRC
+calculator and C code generator.
+  <https://pycrc.org/>
+
+Stigge, Martin; Ploetz, Henryk; Mueller, Wolf; Redlich, Jens-Peter
+(May 2006).  "Reversing CRC -- Theory and Practice".  Berlin: Humboldt
+University Berlin.
+  <https://sar.informatik.hu-berlin.de/research/publications/
+    SAR-PR-2006-05/SAR-PR-2006-05_.pdf>
+
+Williams, Ross N. (24 September 1996). "A Painless Guide to CRC Error
+Detection Algorithms V3.00".
+  <http://www.ross.net/crc/download/crc_v3.txt>
+  <http://www.wolfgang-ehrhardt.de/crc_v3.html>
+
+INSPIRATION
+
+CRC RevEng came about from the coincidence of four events:
+
+* Finding the following problems on Lammert Bies' forum, which were
+  beyond the precision or speed of crcbfs.pl:
+  o "baexps_pr1", 3 August 2010, reverse CRC-64 calculation
+    <https://www.lammertbies.nl/forum/viewtopic.php?t=1589>
+  o "movilsystem", 20 August 2010, unknown CRC-16 in 2055-byte codewords
+    <https://www.lammertbies.nl/forum/viewtopic.php?t=1595>
+* Meeting Llamasoft founder Jeff Minter at the R3PLAY Expo 2010 in
+  Blackpool, and subsequently reading his posts on Twitter that November
+  on the progress of code for his game, "Minotaur Rescue".
+    <https://twitter.com/llamasoft_ox/status/3040146031116288>
+* Heavy snowfall in London from 30 November 2010, and:
+* An Internet outage on 2 December 2010, diverting attention to
+  rainy-day projects.
+
+THANKS
+
+The author would like to thank Dr. Mark Adler, Lammert Bies, Wolfgang
+Ehrhardt, Greg Ewing, Prof. Philip Koopman, Thomas Pircher, Dr. Ross
+Williams, and all contributors to CRC RevEng and the CRC Catalogue.
+
+AUTHOR
+
+Greg Cook
+<debounce@yahoo.co.uk>
+<http://regregex.bbcmicro.net/>
+
+-END-

@@ -1,0 +1,232 @@
+CRC RevEng: arbitrary-precision CRC calculator and algorithm finder
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017
+Gregory Cook
+
+This file is part of CRC RevEng.
+
+CRC RevEng is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CRC RevEng is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with CRC RevEng.  If not, see <https://www.gnu.org/licenses/>.
+
+Revision history of CRC RevEng
+
+1.5.0	8 February 2017
+	* Added algorithm CRC-64/GO-ISO and 2 new aliases,
+	  CRC-64/ECMA-182, CRC-64/GO-ECMA, from the CRC Catalogue.
+	* Added a residue field to Williams model output records.
+	* Added -G switch to skip the brute force search pass.
+
+1.4.4	27 July 2016
+	* Added 5 new algorithms, CRC-8/AUTOSAR, CRC-8/OPENSAFETY,
+	  CRC-16/OPENSAFETY-A, CRC-16/OPENSAFETY-B and CRC-32/AUTOSAR
+	  from the CRC Catalogue.
+	* Added a build option to verify the order of the preset and
+	  alias tables at compile time.
+
+1.4.3	14 July 2016
+	* Added algorithm CRC-16/CMS from the CRC Catalogue.
+
+1.4.2	8 July 2016
+	* Added algorithm CRC-16/PROFIBUS from the CRC Catalogue.
+
+1.4.1a	29 June 2016
+	* Fixed a regression that caused the Windows release to crash
+	  on older systems.
+
+1.4.1	27 June 2016
+	* -P sets the Width value just like -k.
+	* pcmp() quickly returns when the comparands are identical.
+	* Added resources for the Windows executable.
+
+1.4.0	24 February 2016
+	* Added 11 new algorithms, CRC-4/INTERLAKEN, CRC-7/UMTS,
+	  CRC-8/LTE, CRC-8/SAE-J1850, CRC-11/UMTS, CRC-16/LJ1200,
+	  CRC-24/BLE, CRC-24/INTERLAKEN, CRC-24/LTE-A, CRC-24/LTE-B,
+	  CRC-30/CDMA, and 4 new aliases, CRC-12/UMTS, CRC-16/LTE,
+	  CRC-16/UMTS, CRC-32/INTERLAKEN, from the CRC Catalogue.
+	* Eliminated string comparison when testing if a model name is
+	  an alias.
+	* Split off presets into preset.c.
+	* Eliminated bogus calls to bsearch() in preset.c.
+
+1.3.1	31 July 2015
+	* Numerical (not raw) arguments and option parameters accept and
+	  discard hexadecimal prefixes 0x, $ and &.
+	* Compacted preset alias table.
+
+1.3.0	9 April 2015
+	* Added -z switch to accept direct binary strings.
+
+1.2.0a  11 February 2014
+	* ARM Tube OS binary included.
+
+1.2.0	28 January 2014
+	* Reintroduced third-party getopt library for RISC OS.
+	* Compacted preset model table and resolved pointer cast
+	  warnings.
+
+1.1.5	14 January 2014
+	* Corrected CRC-40/GSM based on new evidence (thanks to Mark
+	  Cammidge, Peralex).
+	* Added CRC-8/DVB-S2 from the CRC catalogue (thanks to Hartmut
+	  Brandt, German Aerospace Center).
+	* Added the new alias CRC-8/AES from the CRC catalogue.
+	* Further efficiencies in the polynomial handling code when
+	  BMP_BIT is a power of two.
+
+1.1.4	14 October 2013
+	* Added CRC-13/BBC and six cdma2000 algorithms from the CRC
+	  catalogue.
+
+1.1.3	28 September 2013
+	* Attempts to search for non-Williams compliant models (with -M)
+	  are refused.
+	* The Init or XorOut value is solved using the shortest
+	  argument.
+	* Enabled more efficient polynomial handling code when BMP_BIT
+	  is a power of two.
+
+1.1.2	11 June 2013
+	* Preset model checking in -s matches Init and Xorout values
+	  given as 0.  The input model is canonicalised in all modes
+	  before processing (based on WIDTH for -s, based on POLY for
+	  the other modes).
+	* The first progress message is omitted for tidier output.
+	* BMP_BIT and BMP_SUB are validated at compile time.
+
+1.1.1	22 April 2013
+	* Polynomials in progress messages are printed in the correct
+	  format for -p and -q.
+
+1.1.0	9 February 2013
+	* Added -q option, removed hidden -W option.
+	* Prints progress messages during search.
+
+1.05	20 January 2013
+	* Corrected a transcription error in the Poly value of
+	  CRC-82/DARC.  Most architectures were unaffected.
+	* The Perl script now automatically generates code for the large
+	  polynomial bitmaps used in the preset model tables.
+
+1.04	18 January 2013
+	* -s checks even a fully specified model against the supplied
+	  arguments.
+	* Fixed internal searches for first and last significant terms
+	  on machines with non-power-of-2 word lengths.
+
+1.03	19 July 2012
+	* Added algorithm CRC-8/EBU from the CRC catalogue.
+
+1.02	16 July 2012
+	* Added algorithm CRC-15/MPT1327 from the CRC catalogue.
+	* Added a Perl script to relink the preset model tables.
+	* Search iterates through the solutions of Init slightly more
+	  efficiently.
+
+1.01	28 May 2012
+	* Source code constrained to characters in the ANSI C
+	  repertoire.  $ in the Williams model records replaced with 0x.
+	* Unused parameter removed from modpol().
+
+1.00	25 May 2012
+	* Removed two parity models not in the CRC catalogue.
+	* Init values are reverse engineered by Ewing's method, which
+	  runs in O(n^3) time and is therefore much faster on wide CRCs.
+	* Attempts to do a crossed-endian search are refused.  Crossed-
+	  endian searching had not been properly implemented since
+	  version 0.13.
+	* -D dumps the parameters of all models as well as their names.
+
+0.62	12 April 2012
+	* Added algorithm CRC-31/PHILIPS from the CRC catalogue.
+
+0.61	3 March 2012
+	* Reads files properly when the -a parameter is at maximum.
+	* Prints Williams model records in a single-line format.
+
+0.60	20 February 2012
+	* Corrected algorithm CRC-6/DARC per the CRC catalogue.
+	* Standard input is read in binary mode under MinGW.
+	* The user is advised to use reveng -D if a preset is not found.
+	* The third-party getopt library has been removed.
+	* Revised documentation.
+
+0.50	7 September 2011
+	* Argument files are read once.
+	* Multiple argument files may be passed on standard input, with
+	  EOF between them.
+
+0.44	28 August 2011
+	* Added algorithm CRC-64/XZ from the CRC catalogue.
+
+0.43	27 August 2011
+	* Fixed Init/Xorout reflection logic in -V and -v.
+	* Searches wider than one machine word now proceed.
+	* Aborts if compiled with the wrong values of BMPBIT and BMPSUB,
+	  which can cause searches to malfunction.
+
+0.42	3 May 2011
+	* Removed redundant #include from bmpbit.c.
+
+0.41	30 April 2011
+	* Added algorithms CRC-16/TMS37157 and CRC-A and the new alias
+	  CRC-B from the CRC catalogue.
+
+0.40	10 February 2011
+	* Made the preset model definitions ANSI C compliant.
+	* The default is now to right-justify the output whenever
+	  RefOut = False, and to left-justify it whenever RefOut = True.
+	  This reconciles the output with the output of other
+	  calculators.
+
+0.31	4 February 2011
+	* Corrected a transcription error in the Check value of
+	  CRC-32/BZIP2.
+	* Added 3 new aliases from the CRC catalogue.
+	* Removed redundancies from the usage text.
+
+0.30	18 January 2011
+	* Fixed all ANSI C warnings.
+	* Does not crash when -w is set to a small negative value.
+
+0.21	15 January 2011
+	* Added -k and -P options.
+	* Invalid characters in hexadecimal arguments cause an error.
+	* More efficient parsing of hexadecimal arguments.
+	* Renamed some compile options.  Added NOFORCE.
+
+0.20	11 January 2011
+	* Renamed some switches.  Added -V switch to reverse an
+	  algorithm (-v reverses the arguments and resulting CRC as
+	  well, and its reversed model cannot be dumped with -d.)
+	* With -f specified, a STRING equal to - (dash) causes an
+	  argument to be read from standard input.
+	* Option -m now matches model names case-insensitively.
+
+0.13	8 January 2011
+	* Fixed calculation of Init from a known XorOut.
+	* Should successfully find models when RefIn and RefOut
+	  differ.
+
+0.12	7 January 2011
+	* Added options -m and -X.
+	* Forced -W and delisted the switch (still accepted) as narrow
+	  search is broken.
+	* Changed behaviour of preset scanning in -S to list all
+	  matching models and filter against specified parameters.
+
+0.11	5 January 2011
+	* Fixed memory management during either-endian search.
+
+0.10	5 January 2011
+	* Initial release.
+

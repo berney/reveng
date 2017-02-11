@@ -1,0 +1,82 @@
+/* reveng.rc
+ * Greg Cook, 7/Feb/2017
+ */
+
+/* CRC RevEng: arbitrary-precision CRC calculator and algorithm finder
+ * Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017
+ * Gregory Cook
+ *
+ * This file is part of CRC RevEng.
+ *
+ * CRC RevEng is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * CRC RevEng is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with CRC RevEng.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/* This is a Windows resource-definition file.
+ * <https://msdn.microsoft.com/en-us/library/aa380599.aspx>
+ */
+
+/* Use RC or Windres to compile to reveng.res. */
+
+#include <windows.h>
+
+#define VER_FILEVERSION			1,5,0,0
+#define VER_FILEVERSION_STR		"1.5.0.0\0"
+
+#define VER_PRODUCTVERSION		1,5,0,0
+#define VER_PRODUCTVERSION_STR		"1.5.0\0"
+
+#ifndef DEBUG
+#define VER_DEBUG			0
+#else
+#define VER_DEBUG			VS_FF_DEBUG
+#endif
+
+#define VER_FILEFLAGS			0x00
+#define VER_COMPANYNAME_STR		"Greg Cook\0"
+#define VER_FILEDESCRIPTION_STR		"CRC RevEng application\0"
+#define VER_INTERNALNAME_STR		"reveng\0"
+#define VER_LEGALCOPYRIGHT_STR		"Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017  Gregory Cook\0"
+#define VER_ORIGINALFILENAME_STR	"reveng.exe\0"
+#define VER_PRODUCTNAME_STR		"CRC RevEng\0"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION	VER_FILEVERSION
+PRODUCTVERSION	VER_PRODUCTVERSION
+FILEFLAGSMASK	VER_FILEFLAGS
+FILEFLAGS	VS_FFI_FILEFLAGSMASK
+FILEOS		VOS__WINDOWS32
+FILETYPE	VFT_APP
+FILESUBTYPE	VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",	VER_COMPANYNAME_STR
+            VALUE "FileDescription",	VER_FILEDESCRIPTION_STR
+            VALUE "FileVersion",	VER_FILEVERSION_STR
+            VALUE "InternalName",	VER_INTERNALNAME_STR
+            VALUE "LegalCopyright",	VER_LEGALCOPYRIGHT_STR
+            VALUE "OriginalFilename",	VER_ORIGINALFILENAME_STR
+            VALUE "ProductName",	VER_PRODUCTNAME_STR
+            VALUE "ProductVersion",	VER_PRODUCTVERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+1 ICON "reveng.ico"

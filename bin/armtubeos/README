@@ -1,0 +1,16 @@
+System requirements of ARM Tube OS binary
+Greg Cook, 7 February 2017
+
+CRC RevEng has been tested on a 16MB SPROW ARM7TDMI Coprocessor running
+ARM Tube OS version 0.45, with OS 1.20 and OPUS EDOS 0.4 (EDOSPAT 4.90)
+on the host.  Installation on disc is strongly recommended.
+
+To load and run the ARM Tube OS binary successfully, the Disc Filing
+System (DFS) on the host computer must support at least the following:
+- Full 32-bit address handling within *RUN (image loading and execution).
+- Ability to load images >64 KiB to the coprocessor.
+- Tolerance of OSARGS calls with A=2, Y=0.
+- OSFIND must support reason codes with bits 3 and 2 set (see RISC OS 3
+  Programmer's Reference Manual, volume 2, page 79)
+
+This list is provisional and will be updated on further testing.

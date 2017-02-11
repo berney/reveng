@@ -1,0 +1,8 @@
+IF "<CCRomPatch$Dir>"="" THEN Set CCRomPatch$Dir <Obey$Dir>
+Set Boot$NeedCCROMPatch No
+AppSize 32k
+Run <CCRomPatch$Dir>.NeedPatch
+If "<Boot$NeedCCROMPatch>" <> "No" Then RMEnsure ROMPatch 0.05 RMLoad System:Modules.ROMPatch
+If "<Boot$NeedCCROMPatch>" <> "No" Then RMEnsure ROMPatch 0.05 RMLoad <CCRomPatch$Dir>.ROMPatch
+If "<Boot$NeedCCROMPatch>" <> "No" Then X ROMPatch -file <CCRomPatch$Dir>.<Boot$NeedCCROMPatch>
+Unset Boot$NeedCCROMPatch

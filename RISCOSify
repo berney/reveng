@@ -1,0 +1,81 @@
+| RISCOSify
+| Greg Cook, 8/Feb/2017
+
+| CRC RevEng: arbitrary-precision CRC calculator and algorithm finder
+| Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017
+| Gregory Cook
+|
+| This file is part of CRC RevEng.
+|
+| CRC RevEng is free software: you can redistribute it and/or modify
+| it under the terms of the GNU General Public License as published by
+| the Free Software Foundation, either version 3 of the License, or
+| (at your option) any later version.
+|
+| CRC RevEng is distributed in the hope that it will be useful,
+| but WITHOUT ANY WARRANTY; without even the implied warranty of
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+| GNU General Public License for more details.
+|
+| You should have received a copy of the GNU General Public License
+| along with CRC RevEng.  If not, see <https://www.gnu.org/licenses/>.
+
+| This is a RISC OS Obeyfile.
+
+| Set the type of RISCOSify to Obey, and run RISCOSify, before using
+| Mk/ARMTube or Mk/RISCOS.
+
+Set CRCRevEng$Dir <Obey$Dir>
+IfThere <CRCRevEng$Dir>.bin.armtubeos.README Then SetType <CRCRevEng$Dir>.bin.armtubeos.README &FFF
+IfThere <CRCRevEng$Dir>.bin.armtubeos.reveng Then SetType <CRCRevEng$Dir>.bin.armtubeos.reveng &FF8
+IfThere <CRCRevEng$Dir>.bin.armtubeos.reveng/inf Then SetType <CRCRevEng$Dir>.bin.armtubeos.reveng/inf &FFF
+IfThere <CRCRevEng$Dir>.bin.i386-linux.reveng Then SetType <CRCRevEng$Dir>.bin.i386-linux.reveng &FE6
+IfThere <CRCRevEng$Dir>.bin.raspbian.reveng Then SetType <CRCRevEng$Dir>.bin.raspbian.reveng &FE6
+IfThere <CRCRevEng$Dir>.bin.riscos.reveng Then SetType <CRCRevEng$Dir>.bin.riscos.reveng &FF8
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.!!CCRomPtc Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.!!CCRomPtc &FEB
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.!Load Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.!Load &FEB
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.!Run Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.!Run &FEB
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.NeedPatch Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.NeedPatch &FFB
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.Patch429 Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.Patch429 &FFD
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.Patch432 Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.Patch432 &FFD
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.ROMPatch Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Choices.Default.Boot.PreDesk.CCRomPtc.ROMPatch &FFA
+IfThere <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Resources.!System.!Run Then SetType <CRCRevEng$Dir>.bin.riscos.Select_429.!Boot.Resources.!System.!Run &FEB
+IfThere <CRCRevEng$Dir>.bin.riscos.!System.310.Modules.CLib Then SetType <CRCRevEng$Dir>.bin.riscos.!System.310.Modules.CLib &FFA
+IfThere <CRCRevEng$Dir>.bin.riscos.!System.500.Modules.CLib Then SetType <CRCRevEng$Dir>.bin.riscos.!System.500.Modules.CLib &FFA
+IfThere <CRCRevEng$Dir>.bin.riscos.!System.ReadMe/txt Then SetType <CRCRevEng$Dir>.bin.riscos.ReadMe/txt &FFF
+IfThere <CRCRevEng$Dir>.bin.win32.reveng/exe Then SetType <CRCRevEng$Dir>.bin.win32.reveng/exe &FE4
+IfThere <CRCRevEng$Dir>.bmpbit/c Then SetType <CRCRevEng$Dir>.bmpbit/c &FFF
+IfThere <CRCRevEng$Dir>.CHANGES Then SetType <CRCRevEng$Dir>.CHANGES &FFF
+IfThere <CRCRevEng$Dir>.cli/c Then SetType <CRCRevEng$Dir>.cli/c &FFF
+IfThere <CRCRevEng$Dir>.config/h Then SetType <CRCRevEng$Dir>.config/h &FFF
+IfThere <CRCRevEng$Dir>.contrib.getopt/c Then SetType <CRCRevEng$Dir>.contrib.getopt/c &FFF
+IfThere <CRCRevEng$Dir>.contrib.getopt/h Then SetType <CRCRevEng$Dir>.contrib.getopt/h &FFF
+IfThere <CRCRevEng$Dir>.contrib.Makefile Then SetType <CRCRevEng$Dir>.contrib.Makefile &FE1
+IfThere <CRCRevEng$Dir>.COPYING Then SetType <CRCRevEng$Dir>.COPYING &FFF
+IfThere <CRCRevEng$Dir>.Makefile Then SetType <CRCRevEng$Dir>.Makefile &FE1
+IfThere <CRCRevEng$Dir>.Mk/ARMTube Then SetType <CRCRevEng$Dir>.Mk/ARMTube &FE1
+IfThere <CRCRevEng$Dir>.Mk/RISCOS Then SetType <CRCRevEng$Dir>.Mk/RISCOS &FE1
+IfThere <CRCRevEng$Dir>.Mk/Win32 Then SetType <CRCRevEng$Dir>.Mk/Win32 &FE1
+IfThere <CRCRevEng$Dir>.model/c Then SetType <CRCRevEng$Dir>.model/c &FFF
+IfThere <CRCRevEng$Dir>.poly/c Then SetType <CRCRevEng$Dir>.poly/c &FFF
+IfThere <CRCRevEng$Dir>.preset/c Then SetType <CRCRevEng$Dir>.preset/c &FFF
+IfThere <CRCRevEng$Dir>.README Then SetType <CRCRevEng$Dir>.README &FFF
+IfThere <CRCRevEng$Dir>.relink/pl Then SetType <CRCRevEng$Dir>.relink/pl &102
+IfThere <CRCRevEng$Dir>.reveng/c Then SetType <CRCRevEng$Dir>.reveng/c &FFF
+IfThere <CRCRevEng$Dir>.reveng/h Then SetType <CRCRevEng$Dir>.reveng/h &FFF
+IfThere <CRCRevEng$Dir>.reveng/ico Then SetType <CRCRevEng$Dir>.reveng/ico &132
+IfThere <CRCRevEng$Dir>.reveng/rc Then SetType <CRCRevEng$Dir>.reveng/rc &FFF
+CDir <CRCRevEng$Dir>.c
+CDir <CRCRevEng$Dir>.h
+CDir <CRCRevEng$Dir>.o
+IfThere <CRCRevEng$Dir>.bmpbit/c Then Copy <CRCRevEng$Dir>.bmpbit/c <CRCRevEng$Dir>.c.bmpbit ~CD~V
+IfThere <CRCRevEng$Dir>.cli/c Then Copy <CRCRevEng$Dir>.cli/c <CRCRevEng$Dir>.c.cli ~CD~V
+IfThere <CRCRevEng$Dir>.config/h Then Copy <CRCRevEng$Dir>.config/h <CRCRevEng$Dir>.h.config ~CD~V
+IfThere <CRCRevEng$Dir>.contrib.getopt/c Then Copy <CRCRevEng$Dir>.contrib.getopt/c <CRCRevEng$Dir>.c.getopt ~CD~V
+IfThere <CRCRevEng$Dir>.contrib.getopt/h Then Copy <CRCRevEng$Dir>.contrib.getopt/h <CRCRevEng$Dir>.h.getopt ~CD~V
+IfThere <CRCRevEng$Dir>.model/c Then Copy <CRCRevEng$Dir>.model/c <CRCRevEng$Dir>.c.model ~CD~V
+IfThere <CRCRevEng$Dir>.poly/c Then Copy <CRCRevEng$Dir>.poly/c <CRCRevEng$Dir>.c.poly ~CD~V
+IfThere <CRCRevEng$Dir>.preset/c Then Copy <CRCRevEng$Dir>.preset/c <CRCRevEng$Dir>.c.preset ~CD~V
+IfThere <CRCRevEng$Dir>.reveng/c Then Copy <CRCRevEng$Dir>.reveng/c <CRCRevEng$Dir>.c.reveng ~CD~V
+IfThere <CRCRevEng$Dir>.reveng/h Then Copy <CRCRevEng$Dir>.reveng/h <CRCRevEng$Dir>.h.reveng ~CD~V
+IfThere <CRCRevEng$Dir>.RISCOSify Then SetType <CRCRevEng$Dir>.RISCOSify &FEB

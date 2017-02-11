@@ -1,0 +1,8 @@
+| !Run file for !System, version 0.82 (25-Sep-02)
+|
+IconSprites <Obey$Dir>.!Sprites
+WimpSlot 20k 20k
+Set System$Dir <Obey$Dir>
+/<System$Dir>.SysPaths
+If Boot$OSVersion >= 310 Then RMEnsure UtilityModule 3.70 RMEnsure CallASWI 0.02 RMLoad System:Modules.CallASWI
+If Boot$OSVersion >= 310 Then RMEnsure FPEmulator 4.03 RMLoad System:Modules.FPEmulator
